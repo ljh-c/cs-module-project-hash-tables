@@ -8,6 +8,9 @@ class HashTableEntry:
         self.next = None
 
 
+    def __repr__(self):
+        return f'HashTableEntry: {repr(self.key)}, {repr(self.value)}'
+
 # Hash table can't have fewer than this many slots
 MIN_CAPACITY = 8
 
@@ -20,8 +23,9 @@ class HashTable:
     Implement this.
     """
 
-    def __init__(self, capacity):
-        # Your code here
+    def __init__(self, capacity: int = MIN_CAPACITY):
+        self.capacity = capacity
+        self.storage = [None for i in range(capacity)]
 
 
     def get_num_slots(self):
@@ -56,15 +60,21 @@ class HashTable:
         # Your code here
 
 
+    # why 5381 and 33? https://stackoverflow.com/a/31621312
     def djb2(self, key):
         """
         DJB2 hash, 32-bit
 
         Implement this, and/or FNV-1.
         """
-        # Your code here
+        hash = 5381
+        
+        for char in key:
+            hash = (hash * 33) + ord(char)
+        
+        return hash
 
-
+        
     def hash_index(self, key):
         """
         Take an arbitrary key and return a valid integer index
@@ -81,8 +91,9 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+        bucket = self.hash_index(key)
 
+        self.storage[bucket] = HashTableEntry(key, value)
 
     def delete(self, key):
         """
@@ -92,8 +103,12 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+        bucket = self.hash_index(key)
 
+        if self.storage[bucket] is None:
+            print('KEY NOT FOUND!')
+        else:
+            self.storage[bucket] = None
 
     def get(self, key):
         """
@@ -103,7 +118,12 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+        bucket = self.hash_index(key)
+
+        if self.storage[bucket] is not None:
+            return self.storage[bucket].value
+        else:
+            return None
 
 
     def resize(self, new_capacity):
@@ -115,6 +135,9 @@ class HashTable:
         """
         # Your code here
 
+
+    def __repr__(self):
+        return str(self.storage)
 
 
 if __name__ == "__main__":
@@ -133,21 +156,21 @@ if __name__ == "__main__":
     ht.put("line_11", "So rested he by the Tumtum tree")
     ht.put("line_12", "And stood awhile in thought.")
 
-    print("")
+    print(ht)
 
-    # Test storing beyond capacity
-    for i in range(1, 13):
-        print(ht.get(f"line_{i}"))
+    # # Test storing beyond capacity
+    # for i in range(1, 13):
+    #     print(ht.get(f"line_{i}"))
 
-    # Test resizing
-    old_capacity = ht.get_num_slots()
-    ht.resize(ht.capacity * 2)
-    new_capacity = ht.get_num_slots()
+    # # Test resizing
+    # old_capacity = ht.get_num_slots()
+    # ht.resize(ht.capacity * 2)
+    # new_capacity = ht.get_num_slots()
 
-    print(f"\nResized from {old_capacity} to {new_capacity}.\n")
+    # print(f"\nResized from {old_capacity} to {new_capacity}.\n")
 
-    # Test if data intact after resizing
-    for i in range(1, 13):
-        print(ht.get(f"line_{i}"))
+    # # Test if data intact after resizing
+    # for i in range(1, 13):
+    #     print(ht.get(f"line_{i}"))
 
-    print("")
+    # print("")
