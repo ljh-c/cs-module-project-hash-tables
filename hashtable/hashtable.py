@@ -7,7 +7,6 @@ class HashTableEntry:
         self.value = value
         self.next = None
 
-
     def __repr__(self):
         return f'HashTableEntry: {repr(self.key)}, {repr(self.value)}'
 
@@ -74,13 +73,12 @@ class HashTable:
         
         return hash
 
-        
     def hash_index(self, key):
         """
         Take an arbitrary key and return a valid integer index
         between within the storage capacity of the hash table.
         """
-        #return self.fnv1(key) % self.capacity
+        # return self.fnv1(key) % self.capacity
         return self.djb2(key) % self.capacity
 
     def put(self, key, value):
@@ -93,7 +91,21 @@ class HashTable:
         """
         bucket = self.hash_index(key)
 
-        self.storage[bucket] = HashTableEntry(key, value)
+        if self.storage[bucket] is None:
+            self.storage[bucket] = HashTableEntry(key, value)
+        else:
+            # COLLISION
+            current = self.storage[bucket]
+
+            while current.next is not None and current.key != key:
+                current = current.next
+
+            if current.key == key:
+                # Overwrite
+                current.value = value
+            else:
+                # Add if key does not exist
+                current.next = HashTableEntry(key, value)
 
     def delete(self, key):
         """
@@ -105,10 +117,21 @@ class HashTable:
         """
         bucket = self.hash_index(key)
 
-        if self.storage[bucket] is None:
-            print('KEY NOT FOUND!')
+        current = self.storage[bucket]
+
+        if current is None:
+            print('KEY WAS NOT FOUND!!!')
+        elif current.key == key:
+            self.storage[bucket] = current.next
         else:
-            self.storage[bucket] = None
+            # Look for key in next
+            while current.next is not None and current.next.key != key:
+                current = current.next
+
+            if current.next.key == key:
+                current.next = current.next.next
+            else:
+                print('KEY WAS NOT FOUND!!!')
 
     def get(self, key):
         """
@@ -121,8 +144,13 @@ class HashTable:
         bucket = self.hash_index(key)
 
         if self.storage[bucket] is not None:
-            return self.storage[bucket].value
-        else:
+            current = self.storage[bucket]
+
+            while current.key != key:
+                current = current.next
+
+            return current.value
+        else: 
             return None
 
 
@@ -141,23 +169,23 @@ class HashTable:
 
 
 if __name__ == "__main__":
-    ht = HashTable(8)
+    ht = HashTable(1)
 
     ht.put("line_1", "'Twas brillig, and the slithy toves")
-    ht.put("line_2", "Did gyre and gimble in the wabe:")
-    ht.put("line_3", "All mimsy were the borogoves,")
-    ht.put("line_4", "And the mome raths outgrabe.")
-    ht.put("line_5", '"Beware the Jabberwock, my son!')
-    ht.put("line_6", "The jaws that bite, the claws that catch!")
-    ht.put("line_7", "Beware the Jubjub bird, and shun")
-    ht.put("line_8", 'The frumious Bandersnatch!"')
-    ht.put("line_9", "He took his vorpal sword in hand;")
-    ht.put("line_10", "Long time the manxome foe he sought--")
-    ht.put("line_11", "So rested he by the Tumtum tree")
-    ht.put("line_12", "And stood awhile in thought.")
+    # ht.put("line_2", "Did gyre and gimble in the wabe:")
+    # ht.put("line_3", "All mimsy were the borogoves,")
+    # ht.put("line_4", "And the mome raths outgrabe.")
+    # ht.put("line_5", '"Beware the Jabberwock, my son!')
+    # ht.put("line_6", "The jaws that bite, the claws that catch!")
+    # ht.put("line_7", "Beware the Jubjub bird, and shun")
+    # ht.put("line_8", 'The frumious Bandersnatch!"')
+    # ht.put("line_9", "He took his vorpal sword in hand;")
+    # ht.put("line_10", "Long time the manxome foe he sought--")
+    # ht.put("line_11", "So rested he by the Tumtum tree")
+    # ht.put("line_12", "And stood awhile in thought.")
 
-    print(ht)
-
+    ht.delete('line_1')
+    print(ht.get('line_1'))
     # # Test storing beyond capacity
     # for i in range(1, 13):
     #     print(ht.get(f"line_{i}"))
