@@ -1,5 +1,18 @@
 def no_dups(s):
-    # Your code here
+    strings = s.split()
+
+    count = set()
+
+    res = []
+
+    for word in strings:
+        if word not in count:
+            count.add(word)
+            res.append(word)
+
+    return " ".join(res)
+
+# in place?
 
 
 

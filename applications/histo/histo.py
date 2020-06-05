@@ -25,7 +25,5 @@ longest_word, v = max(freq_arr, key=lambda w: len(w[0]))
 
 # print(freq_arr)
 
-sep = '#'
-
 for k, v in freq_arr:
     print(f'{k:{len(longest_word) + 1}} {"#" * v}')
